@@ -139,7 +139,7 @@ def abonelik(update, context):
   first_name = user["first_name"]
   last_name = user["last_name"]
   telegramId = user["id"]
-  check_id = models.check_person(id)
+  check_id = models.check_person(telegramId)
   if check_id is None:
     models.add_user(telegramId, first_name, last_name)
     text = "Abonelik kaydınız oluşturuldu! Her gün Saat 09:00'da günün menüsü sizinle paylaşılacaktır."
@@ -156,7 +156,7 @@ def abonelik(update, context):
 def abonelikiptal(update, context):
   user = update.message.from_user
   telegramId= user["id"]
-  check_id = models.check_person(id)
+  check_id = models.check_person(telegramId)
   print(check_id)
   if check_id is None:
     text = "Aboneliğiniz bulunmamaktadır."
