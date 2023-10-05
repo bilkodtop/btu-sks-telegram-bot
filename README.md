@@ -3,7 +3,7 @@ Telegram üzerinden günlük yemek takibini yapabileceğiniz ve takibini yapmak 
 ## Projenin Amacı : Bursa Teknik Üniversitesinin Yemek Menüsünü Pratikçe Öğrenme Botu (Telegram)
 ### **Başlarken**:
 - `git clone [repo]`
-- `cd hafize-ana-telegram`
+- `cd btu-sks-telegram-bot`
 - `pip install -r requirements.txt` 
 - `python main.py`
 ### **Komutlar** : 
