@@ -21,13 +21,13 @@ class Menu():
         for _ in range(daysOfMonthCount - 2):
             excelRowCount += 1
             dateOfMonth.append(menuListOfMonth[excelRowCount][0])
-            tempMenuRow = [menuListOfMonth[excelRowCount][2], menuListOfMonth[excelRowCount][3], menuListOfMonth[excelRowCount][4], menuListOfMonth[excelRowCount][5]]
+            tempMenuRow = [menuListOfMonth[excelRowCount][2], menuListOfMonth[excelRowCount][3], menuListOfMonth[excelRowCount][4], menuListOfMonth[excelRowCount][5],menuListOfMonth[excelRowCount][6]]
             tempMenuRow = "\n".join(tempMenuRow)
             sortedMenuList.append(tempMenuRow)
         finalFormOfMenuList = []
         daysOfMonthCount2 = 0
         for isEmpty in sortedMenuList:
-            if isEmpty == '\n\n\n':
+            if isEmpty == '\n\n\n\n':
                 weekendText = sortedMenuList[daysOfMonthCount2].replace('\n\n\n', 'Haftasonu Yemek Hizmeti Yoktur')
                 finalFormOfMenuList.append(weekendText)
                 daysOfMonthCount2 += 1

@@ -9,6 +9,8 @@ import scrape
 import os
 import time
 import sksduyuru
+import dotenv
+dotenv.load_dotenv()
 
 calculatedNextYearDate = datetime.datetime.now().year
 calculatedNextMonthDate = datetime.datetime.now().month
@@ -24,7 +26,7 @@ except:
   scrape.ScrapeMenu().getPdf()
   scrape.ScrapeMenu().convertPdfToCsv()
   menuList, date = getmenu.Menu().getFormattedMenu()
-Token = "TOKEN"
+Token = os.getenv("TOKEN")
 
 models = Models()
 models.create_table()
@@ -84,8 +86,8 @@ def getmenu(update, context):
   else:
     userInput = context.args[0]
   if (int(userInput) > 0):
-    daysDate = (date[int(userInput) - 1] + " Tarihli Günün Menüsü")
-    daysMenu = menuList[int(userInput) - 1]
+    daysDate = (date[int(userInput) - 2] + " Tarihli Günün Menüsü")
+    daysMenu = menuList[int(userInput) - 2]
     daysMenuText = daysDate + "\n" + daysMenu
     update.message.reply_text(daysMenuText)
   #add message to database
