@@ -29,6 +29,15 @@ class Models:
             message_date DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         ''')
+
+    self.cursor.execute('''
+        CREATE TABLE IF NOT EXISTS announcements (
+            id INTEGER PRIMARY KEY,
+            title TEXT DEFAULT "",
+            link TEXT DEFAULT "",
+            publish_date DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
     self.db.commit()
 
   def add_user(self, chat_id, first_name, last_name):
@@ -70,5 +79,27 @@ class Models:
   def get_all_messages(self):
     self.cursor.execute('''
         SELECT * FROM messages
+        ''')
+    return self.cursor.fetchall()
+
+  
+  def add_announcement(self,id,title, link,publish_date):
+    """Adds announcements to database"""
+    self.cursor.execute(
+      '''
+        INSERT INTO announcements (id, title, link,publish_date) VALUES (?, ?, ?, ?)
+        ''', (id, title, link,publish_date))
+    self.db.commit()
+  def delete_announcement(self,id):
+    """Deletes announcements from database"""
+    self.cursor.execute(
+      '''
+        DELETE FROM announcements WHERE id = ?
+        ''', (id,))
+    self.db.commit()
+
+  def check_all_announcements(self):
+    self.cursor.execute('''
+        SELECT id,title FROM announcements
         ''')
     return self.cursor.fetchall()
