@@ -14,9 +14,11 @@ class DUYURU:
             self.date = date
             self.id = id
 
-    def __init__(self, url="https://sks.btu.edu.tr/tr/duyuru/birim/108",ann_list=[]):
+    def __init__(self, url="https://sks.btu.edu.tr/tr/duyuru/birim/108",ann_list=[],new_content=[]):
         self.url = url
         self.ann_list = ann_list
+        self.new_content=new_content
+        
 
     def scrape_announcements(self):
         response = requests.get(self.url)
@@ -39,24 +41,38 @@ class DUYURU:
                 print("Hata oluştu. Duyuru id'si: " + id)
         return self.ann_list
 
-    def add_to_db(self, ann_list):
-        for ann in ann_list:
-            models.add_announcement(ann.id, ann.title, ann.link, ann.date)
-
     def check_for_new_content(self):
         site_list = self.scrape_announcements()
         database_list = models.check_all_announcements()
-        
         for i in range(len(site_list)):
-            if (site_list[i].id != database_list[i][0] and site_list[i].title != database_list[i][1]):
-                models.add_announcement(site_list[i].id, site_list[i].title,
-                                        site_list[i].link, site_list[i].date)
-
-        for i in range(len(database_list)):
-            if (database_list[i][0] != site_list[i].id and database_list[i][1] != site_list[i].title):
-                models.delete_announcement(database_list[i][0])
+            site_announcement = site_list[i]
+            found = False
+            
+            for j in range(len(database_list)):
+                database_announcement = database_list[j]
                 
-if __name__ == "__main__":
-    duyuru_instance = DUYURU()
-    duyuru_instance.scrape_announcements()
-    duyuru_instance.add_to_db(duyuru_instance.ann_list) 
+                if site_announcement.id == database_announcement[0] and site_announcement.title == database_announcement[1]:
+                    found = True
+                    break
+
+            if not found:
+                print(f"Announcement added id:{site_announcement.id} title:{site_announcement.title} link:{site_announcement.link} date:{site_announcement.date}")
+                models.add_announcement(site_announcement.id, site_announcement.title, site_announcement.link, site_announcement.date)
+                self.new_content.append(site_announcement)
+            
+
+        for j in range(len(database_list)):
+            database_announcement = database_list[j]
+            found = False
+            for i in range(len(site_list)):
+                site_announcement = site_list[i]
+                
+                if site_announcement.id == database_announcement[0] and site_announcement.title == database_announcement[1]:
+                    found = True
+                    break
+
+            if not found:
+                print(f"Announcement deleted id:{database_announcement[0]}")
+                models.delete_announcement(database_announcement[0])
+        
+        return self.new_content
