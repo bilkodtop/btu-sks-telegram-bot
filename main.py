@@ -119,9 +119,13 @@ def checkSksContent(context: CallbackContext):
   ann = sksduyuru.DUYURU("https://sks.btu.edu.tr/tr/duyuru/birim/108")
   new_content = ann.check_for_new_content()
   for content in new_content:
-    text=f"DUYURU \n {content.title} \n {content.date} \n\n Daha fazla bilgi için {content.link}"
-    url = f"https://api.telegram.org/bot{Token}/sendMessage?chat_id=@BTU_SKS&text={text}"
-    requests.get(url).json()
+    text=f"DUYURU \n {content.title} \n {content.date} \n\n Daha fazla bilgi için [Tıklayınız]({content.link})"
+    data = {
+    'chat_id':"@BTU_SKS",
+    'text': text,
+    'parse_mode': 'Markdown',
+}
+    requests.post(f'https://api.telegram.org/bot{Token}/sendMessage',data=data)
 
 j.run_daily(checkSksContent,
              datetime.time(hour=8,
