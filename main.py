@@ -12,13 +12,6 @@ import sksduyuru
 import dotenv
 dotenv.load_dotenv()
 
-calculatedNextYearDate = datetime.datetime.now().year
-calculatedNextMonthDate = datetime.datetime.now().month
-if calculatedNextMonthDate == 12:
-  calculatedNextMonthDate = 1
-  calculatedNextYearDate += 1
-else:
-  calculatedNextMonthDate += 1
 
 try:
   menuList, date = getmenu.Menu().getFormattedMenu()
@@ -26,6 +19,7 @@ except:
   scrape.ScrapeMenu().getPdf()
   scrape.ScrapeMenu().convertPdfToCsv()
   menuList, date = getmenu.Menu().getFormattedMenu()
+
 Token = os.getenv("TOKEN")
 
 models = Models()
@@ -37,18 +31,19 @@ j = updater.job_queue
 
 
 
-def restartEveryMonth(context: CallbackContext):
+def restartEveryDay(context: CallbackContext):
   os.system("rm yemekhane.csv")
-  time.sleep(60)
-  os.system("kill 1")
+  time.sleep(1)
+  os.system("rm pdf0.pdf")
+  time.sleep(5)
+  os.system("kill 1") #For here need a new command file which runs and restarts main.py
 
 
-j.run_monthly(restartEveryMonth,
-              datetime.datetime(calculatedNextYearDate,
-                                calculatedNextMonthDate,
-                                1,
-                                tzinfo=pytz.timezone('Europe/Istanbul')),
-              day=1)
+j.run_daily(restartEveryDay,
+            datetime.time(hour=8,
+                          minute=55,
+                          tzinfo=pytz.timezone('Europe/Istanbul')),
+                          days=("mon", "tue", "wed", "thu", "fri","sat","sun"))
 
 
 def start(update, context):
