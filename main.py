@@ -71,11 +71,12 @@ def duyurular(update,context):
     }
       requests.post(f'https://api.telegram.org/bot{Token}/sendMessage',data=data)
 #admin-command
-def yenidengonder(update,context):
+def duyuru(update,context):
   admin_id = update.message.from_user.id
   #admin_list will be crated in .env file
   if(admin_id in admin_list):
-    announcement=models.admin_send_one_announcement()
+    userInput = context.args[0]
+    announcement=models.admin_send_one_announcement(userInput)
     text=f"DUYURU \n {announcement[1]} \n {announcement[2]} \n\n Daha fazla bilgi için [Tıklayınız]({announcement[3]})"
     data = {
     'chat_id':"@BTU_SKS",
