@@ -44,35 +44,24 @@ class DUYURU:
     def check_for_new_content(self):
         site_list = self.scrape_announcements()
         database_list = models.check_all_announcements()
-        for i in range(len(site_list)):
-            site_announcement = site_list[i]
+        new_content = []  # Yeni eklenen duyuruları takip etmek için liste
+
+        # Sitedeki duyuruları döngüye alın
+        for site_announcement in site_list:
             found = False
-            
-            for j in range(len(database_list)):
-                database_announcement = database_list[j]
-                
+
+            # Veritabanındaki duyuruları döngüye alın
+            for database_announcement in database_list:
                 if site_announcement.id == database_announcement[0] and site_announcement.title == database_announcement[1]:
                     found = True
-                    break
+                    break  # Eşleşme bulundu, iç içe döngüyü sonlandır
 
+            # Eğer site duyurusu veritabanında bulunmuyorsa, yeni duyuruyu ekleyin
             if not found:
-                print(f"Announcement added id:{site_announcement.id} title:{site_announcement.title} link:{site_announcement.link} date:{site_announcement.date}")
-                models.add_announcement(site_announcement.id, site_announcement.title, site_announcement.link, site_announcement.date)
-                self.new_content.append(site_announcement)
-            
-
-        for j in range(len(database_list)):
-            database_announcement = database_list[j]
-            found = False
-            for i in range(len(site_list)):
-                site_announcement = site_list[i]
-                
-                if site_announcement.id == database_announcement[0] and site_announcement.title == database_announcement[1]:
-                    found = True
-                    break
-
-            if not found:
-                print(f"Announcement deleted id:{database_announcement[0]}")
-                models.delete_announcement(database_announcement[0])
-        
-        return self.new_content
+                try:
+                    models.add_announcement(site_announcement.id, site_announcement.title, site_announcement.link, site_announcement.date)
+                    new_content.append(site_announcement)
+                    print(f"Announcement added id:{site_announcement.id} title:{site_announcement.title} link:{site_announcement.link} date:{site_announcement.date}")
+                except:
+                    pass
+        return new_content
