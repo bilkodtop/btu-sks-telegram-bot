@@ -20,7 +20,7 @@ except:
   scrape.ScrapeMenu().convertPdfToCsv()
   menuList, date = getmenu.Menu().getFormattedMenu()
 
-Token = os.getenv("TOKEN")
+Token = "TOKEN"
 
 models = Models()
 models.create_table()
@@ -119,14 +119,18 @@ def checkSksContent(context: CallbackContext):
   ann = sksduyuru.DUYURU("https://sks.btu.edu.tr/tr/duyuru/birim/108")
   new_content = ann.check_for_new_content()
   for content in new_content:
-    text=f"DUYURU \n {content.title} \n {content.publish_date} \n\n Daha fazla bilgi için {content.link}"
-    url = f"https://api.telegram.org/bot{Token}/sendMessage?chat_id=@BTU_SKS&text={text}"
-    requests.get(url).json()
-  ann.get_first_announcement_link()
+    text=f"DUYURU \n {content.title} \n {content.date} \n\n Daha fazla bilgi için [Tıklayınız]({content.link})"
+    print(text)
+    data = {
+    'chat_id':"@BTU_SKS",
+     'text': text,
+     'parse_mode': 'Markdown',
+ }
+    requests.post(f'https://api.telegram.org/bot{Token}/sendMessage',data=data)
 
 j.run_daily(checkSksContent,
-             datetime.time(hour=9,
-                           minute=0,
+             datetime.time(hour=22,
+                           minute=14,
                            tzinfo=pytz.timezone('Europe/Istanbul')),
              days=("mon", "tue", "wed", "thu", "fri","sat","sun"))
 
