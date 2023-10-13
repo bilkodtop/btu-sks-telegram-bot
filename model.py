@@ -103,3 +103,16 @@ class Models:
         SELECT id,title FROM announcements
         ''')
     return self.cursor.fetchall()
+  
+  def admin_get_all_announcement(self):
+      self.cursor.execute('''
+        SELECT * FROM announcements
+        ''')
+      return self.cursor.fetchall()
+
+  def admin_send_one_announcement(self,id):
+
+    self.cursor.execute('''
+        SELECT * FROM announcements WHERE id = ?
+        ''',(id,))
+    return self.cursor.fetchone()
