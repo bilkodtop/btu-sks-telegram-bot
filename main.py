@@ -216,7 +216,7 @@ def messages_to_add(info):
 
 dispatcher.add_handler(telegram.ext.CommandHandler('start', start))
 dispatcher.add_handler(telegram.ext.CommandHandler('duyurular', duyurular))
-dispatcher.add_handler(telegram.ext.CommandHandler('duyurular', yenidengonder))
+dispatcher.add_handler(telegram.ext.CommandHandler('duyurular', duyuru))
 dispatcher.add_handler(telegram.ext.CommandHandler('menu', getmenu))
 dispatcher.add_handler(telegram.ext.CommandHandler('yemekhane', yemekhane))
 dispatcher.add_handler(telegram.ext.CommandHandler('abonelik', abonelik))
