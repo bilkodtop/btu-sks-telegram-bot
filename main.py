@@ -126,8 +126,8 @@ def getmenu(update, context):
 def sendDaysMenu(context: CallbackContext):
   kayitliKisiListesi = models.check_all()
   userInput = datetime.datetime.now().day
-  daysDate = (date[int(userInput) - 1] + " Tarihli Günün Menüsü")
-  daysMenu = menuList[int(userInput) - 1]
+  daysDate = (date[int(userInput) - 2] + " Tarihli Günün Menüsü")
+  daysMenu = menuList[int(userInput) - 2]
   daysMenuText = daysDate + "\n" + daysMenu
 
   for eachPerson in range(len(kayitliKisiListesi)):
