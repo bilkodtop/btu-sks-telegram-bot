@@ -137,10 +137,8 @@ def sendDaysMenu(context: CallbackContext):
     try:
       url = f"https://api.telegram.org/bot{Token}/sendMessage?chat_id={telegramId}&text={daysMenuText}"
       requests.get(url).json()
-      eachPerson += 1
     except:
       print(f"{telegramId} abone olmus ama yetki vermemis")
-      eachPerson += 1
 
 j.run_daily(sendDaysMenu,
             datetime.time(hour=9,

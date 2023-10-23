@@ -1,7 +1,12 @@
 import sqlite3
 from datetime import datetime
+import requests
+from dotenv import load_dotenv
+import os
+import getmenu
 
-
+load_dotenv()
+Token = os.getenv("TOKEN")
 class Models:
 
   def __init__(self):
@@ -116,3 +121,23 @@ class Models:
         SELECT * FROM announcements WHERE id = ?
         ''',(id,))
     return self.cursor.fetchone()
+
+class Scripts:
+  def __init__():
+    pass
+
+  def push_daily_message():
+    model = Models()
+    menuList, date = getmenu.Menu().getFormattedMenu()
+    userInput = datetime.now().day
+    daysDate = (date[int(userInput) - 2] + " Tarihli Günün Menüsü")
+    daysMenu = menuList[int(userInput) - 2]
+    daysMenuText = daysDate + "\n" + daysMenu
+    all_subscribers = model.check_all()
+    for eachPerson in range(len(all_subscribers)):
+      telegramId = all_subscribers[eachPerson][0]
+      try:
+        url = f"https://api.telegram.org/bot{Token}/sendMessage?chat_id={telegramId}&text={daysMenuText}"
+        req = requests.get(url).json()
+      except:
+        print(f"{telegramId} abone olmus ama yetki vermemis")
