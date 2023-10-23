@@ -20,7 +20,7 @@ except:
   scrape.ScrapeMenu().convertPdfToCsv()
   menuList, date = getmenu.Menu().getFormattedMenu()
 
-Token = "TOKEN"
+Token = os.getenv("TOKEN")
 
 models = Models()
 models.create_table()
@@ -60,6 +60,7 @@ def start(update, context):
 def duyurular(update,context):
   admin_id = update.message.from_user.id
   #admin_list will be crated in .env file
+  admin_list = os.getenv("ADMIN_LIST")
   if(admin_id in admin_list):
     all_announcements=models.admin_get_all_announcement()
     for i in range(len(all_announcements)):
@@ -74,6 +75,7 @@ def duyurular(update,context):
 def duyuru(update,context):
   admin_id = update.message.from_user.id
   #admin_list will be crated in .env file
+  admin_list = os.getenv("ADMIN_LIST")
   if(admin_id in admin_list):
     userInput = context.args[0]
     announcement=models.admin_send_one_announcement(userInput)
