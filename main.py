@@ -116,8 +116,8 @@ def getmenu(update, context):
   else:
     userInput = context.args[0]
   if (int(userInput) > 0):
-    daysDate = (date[int(userInput) - 2] + " Tarihli Günün Menüsü")
-    daysMenu = menuList[int(userInput) - 2]
+    daysDate = (date[int(userInput) - 1] + " Tarihli Günün Menüsü")
+    daysMenu = menuList[int(userInput) - 1]
     daysMenuText = daysDate + "\n" + daysMenu
     update.message.reply_text(daysMenuText)
   #add message to database
@@ -128,8 +128,8 @@ def getmenu(update, context):
 def sendDaysMenu(context: CallbackContext):
   kayitliKisiListesi = models.check_all()
   userInput = datetime.datetime.now().day
-  daysDate = (date[int(userInput) - 2] + " Tarihli Günün Menüsü")
-  daysMenu = menuList[int(userInput) - 2]
+  daysDate = (date[int(userInput) - 1] + " Tarihli Günün Menüsü")
+  daysMenu = menuList[int(userInput) - 1]
   daysMenuText = daysDate + "\n" + daysMenu
 
   for eachPerson in range(len(kayitliKisiListesi)):
