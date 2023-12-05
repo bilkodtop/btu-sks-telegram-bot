@@ -130,8 +130,8 @@ class Scripts:
     model = Models()
     menuList, date = getmenu.Menu().getFormattedMenu()
     userInput = datetime.now().day
-    daysDate = (date[int(userInput) - 1] + " Tarihli Günün Menüsü")
-    daysMenu = menuList[int(userInput) - 1]
+    daysDate = (date[int(userInput)] + " Tarihli Günün Menüsü")
+    daysMenu = menuList[int(userInput)]
     daysMenuText = daysDate + "\n" + daysMenu
     all_subscribers = model.check_all()
     for eachPerson in range(len(all_subscribers)):
