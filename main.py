@@ -1,100 +1,80 @@
-import telegram.ext
-import datetime
-from telegram.ext import CallbackContext
-from model import Models
-import pytz
-import requests
 import getmenu
 import scrape
+from model import Models
+from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
+from telegram import Update
+import logging
+import datetime
 import os
 import time
-import sksduyuru
-import dotenv
-dotenv.load_dotenv()
-
+import requests
 
 try:
-  menuList, date = getmenu.Menu().getFormattedMenu()
+  menuList = getmenu.Menu().getFormattedMenu()
 except:
   scrape.ScrapeMenu().getPdf()
-  scrape.ScrapeMenu().convertPdfToCsv()
-  menuList, date = getmenu.Menu().getFormattedMenu()
+  menuList = getmenu.Menu().getFormattedMenu()
 
-Token = "TOKEN"
+Token = "6831215537:AAG3Ha42FvltfW0epXagBj7q8Z-7OsWpKBE"
 
 models = Models()
 models.create_table()
 
-updater = telegram.ext.Updater(Token, use_context=True)
-dispatcher = updater.dispatcher
-j = updater.job_queue
 
+logging.basicConfig(
+  format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+  level=logging.INFO
+)
 
-
-def restartEveryDay(context: CallbackContext):
-  os.system("rm yemekhane.csv")
-  time.sleep(1)
-  os.system("rm pdf0.pdf")
-  time.sleep(5)
-  os.system("kill 1") #For here need a new command file which runs and restarts main.py
-
-
-j.run_daily(restartEveryDay,
-            datetime.time(hour=8,
-                          minute=55,
-                          tzinfo=pytz.timezone('Europe/Istanbul')),
-                          days=("mon", "tue", "wed", "thu", "fri","sat","sun"))
-
-
-def start(update, context):
-  update.message.reply_text(
-    "Bursa Teknik Üniversitesi Yemekhane Telegram botuna hoşgeldiniz. /help yazarak komutlara erişebilirsiniz.!"
-  )
-  info = update.message
-  messages_to_add(info)
-
-
-def yemekhane(update, context):
-  user = update.message.from_user
-  print('You talk with user {} and his user ID: {} and his name is {}'.format(
-    user['username'], user['id'], user['first_name']))
-  update.message.reply_text("""
-    /menu gün -> girdiğiniz günün menüsünü görebilirsiniz, gün girmezseniz içinde olduğunuz günün menüsünü görebilirsiniz.\n\n/abonelik  -> botumuzda abonelik başlatarak her gün saat 09.00'da botumuzdan menüyü telegram'dan özel mesaj olarak alabilirsiniz.(Sadece /abonelik yazarak günlük mesaj alamazsınız botun kendisine tıklayıp mesajlaşma başlatmanız gerekmektedir)\n\n/abonelikiptal -> aboneliğinizi iptal eder.
-    """)
-  info = update.message
-  messages_to_add(info)
-
-def help(update, context):
-  user = update.message.from_user
-  print('You talk with user {} and his user ID: {} and his name is {}'.format(
-    user['username'], user['id'], user['first_name']))
-  update.message.reply_text("""
-    /menu gün -> girdiğiniz günün menüsünü görebilirsiniz, gün girmezseniz içinde olduğunuz günün menüsünü görebilirsiniz.\n\n/abonelik  -> botumuzda abonelik başlatarak her gün saat 09.00'da botumuzdan menüyü telegram'dan özel mesaj olarak alabilirsiniz.(Sadece /abonelik yazarak günlük mesaj alamazsınız botun kendisine tıklayıp mesajlaşma başlatmanız gerekmektedir)\n\n/abonelikiptal -> aboneliğinizi iptal eder.
-    """)
-  info = update.message
-  messages_to_add(info)
-
-
-def getmenu(update, context):
+async def getMenu(update: Update, context: ContextTypes.DEFAULT_TYPE):
   if context.args == []:
-    userInput = datetime.datetime.now().day
+     userInput = datetime.datetime.now().day
   else:
-    userInput = context.args[0]
+     userInput = context.args[0]
   if (int(userInput) > 0):
-    daysDate = (date[int(userInput) - 2] + " Tarihli Günün Menüsü")
-    daysMenu = menuList[int(userInput) - 2]
-    daysMenuText = daysDate + "\n" + daysMenu
-    update.message.reply_text(daysMenuText)
-  #add message to database
+      daysMenu = menuList[int(userInput)-1]
+      await context.bot.send_message(chat_id=update.effective_chat.id, text = daysMenu)
   info = update.message
   messages_to_add(info)
 
+async def yemekhane(update: Update, context: ContextTypes.DEFAULT_TYPE):
+  user = update.message.from_user
+  print('You talk with user {} and his user ID: {} and his name is {}'.format(
+    user['username'], user['id'], user['first_name']))
+  reply_text = """
+    /menu gün -> girdiğiniz günün menüsünü görebilirsiniz, gün girmezseniz içinde olduğunuz günün menüsünü görebilirsiniz.\n\n/abonelik  -> botumuzda abonelik başlatarak her gün saat 09.00'da botumuzdan menüyü telegram'dan özel mesaj olarak alabilirsiniz.(Sadece /abonelik yazarak günlük mesaj alamazsınız botun kendisine tıklayıp mesajlaşma başlatmanız gerekmektedir)\n\n/abonelikiptal -> aboneliğinizi iptal eder.
+    """
+  await context.bot.send_message(chat_id=update.effective_chat.id, text = reply_text)
+  info = update.message
+  messages_to_add(info)
+   
+async def restartEveryDay():
+  global menuList, date
+  os.system("rm pdf0.pdf")
+  time.sleep(1)
+  scrape.ScrapeMenu().getPdf()
+  menuList = getmenu.Menu().getFormattedMenu()   
 
-def sendDaysMenu(context: CallbackContext):
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+  text2 = "Bursa Teknik Üniversitesi Yemekhane Telegram botuna hoşgeldiniz. /help yazarak komutlara erişebilirsiniz.!"
+  await context.bot.send_message(chat_id=update.effective_chat.id, text = text2)
+  info = update.message
+  messages_to_add(info)  
+
+async def duyurular(update: Update, context: ContextTypes.DEFAULT_TYPE):
+  admin_id = update.effective_user.id
+  admin_list = os.getenv("ADMIN_LIST")
+
+  if admin_id in admin_list:
+    await context.bot.send_message(chat_id=update.effective_chat.id, text = "Duyuru yapmak için /duyuru <mesaj> komutunu kullanın")
+  else:
+    await context.bot.send_message(chat_id=update.effective_chat.id, text = "Bu komutu kullanmaya yetkiniz yok")
+
+def sendDaysMenu(context: ContextTypes.DEFAULT_TYPE):
   kayitliKisiListesi = models.check_all()
   userInput = datetime.datetime.now().day
-  daysDate = (date[int(userInput) - 1] + " Tarihli Günün Menüsü")
-  daysMenu = menuList[int(userInput) - 1]
+  daysDate = (date[int(userInput)] + " Tarihli Günün Menüsü")
+  daysMenu = menuList[int(userInput)]
   daysMenuText = daysDate + "\n" + daysMenu
 
   for eachPerson in range(len(kayitliKisiListesi)):
@@ -102,75 +82,19 @@ def sendDaysMenu(context: CallbackContext):
     try:
       url = f"https://api.telegram.org/bot{Token}/sendMessage?chat_id={telegramId}&text={daysMenuText}"
       requests.get(url).json()
-      eachPerson += 1
     except:
       print(f"{telegramId} abone olmus ama yetki vermemis")
-      eachPerson += 1
 
-j.run_daily(sendDaysMenu,
-            datetime.time(hour=9,
-                          minute=0,
-                          tzinfo=pytz.timezone('Europe/Istanbul')),
-            days=("mon", "tue", "wed", "thu", "fri"))
-
-
-
-def checkSksContent(context: CallbackContext):
-  ann = sksduyuru.DUYURU("https://sks.btu.edu.tr/tr/duyuru/birim/108")
-  new_content = ann.check_for_new_content()
-  for content in new_content:
-    text=f"DUYURU \n {content.title} \n {content.date} \n\n Daha fazla bilgi için [Tıklayınız]({content.link})"
-    print(text)
-    data = {
-    'chat_id':"@BTU_SKS",
-     'text': text,
-     'parse_mode': 'Markdown',
- }
-    requests.post(f'https://api.telegram.org/bot{Token}/sendMessage',data=data)
-
-j.run_daily(checkSksContent,
-             datetime.time(hour=22,
-                           minute=14,
-                           tzinfo=pytz.timezone('Europe/Istanbul')),
-             days=("mon", "tue", "wed", "thu", "fri","sat","sun"))
-
-
-def abonelik(update, context):
+async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
   user = update.message.from_user
-  first_name = user["first_name"]
-  last_name = user["last_name"]
-  telegramId = user["id"]
-  check_id = models.check_person(telegramId)
-  if check_id is None:
-    models.add_user(telegramId, first_name, last_name)
-    text = "Abonelik kaydınız oluşturuldu! Her gün Saat 09:00'da günün menüsü sizinle paylaşılacaktır."
-    url = f"https://api.telegram.org/bot{Token}/sendMessage?chat_id={telegramId}&text={text}"
-    requests.get(url).json()
-  else:
-    text = "Zaten aboneliğiniz bulunmaktadır."
-    url = f"https://api.telegram.org/bot{Token}/sendMessage?chat_id={telegramId}&text={text}"
-    requests.get(url).json()
+  print('You talk with user {} and his user ID: {} and his name is {}'.format(
+    user['username'], user['id'], user['first_name']))
+  message = """
+    /menu gün -> girdiğiniz günün menüsünü görebilirsiniz, gün girmezseniz içinde olduğunuz günün menüsünü görebilirsiniz.\n\n/abonelik  -> botumuzda abonelik başlatarak her gün saat 09.00'da botumuzdan menüyü telegram'dan özel mesaj olarak alabilirsiniz.(Sadece /abonelik yazarak günlük mesaj alamazsınız botun kendisine tıklayıp mesajlaşma başlatmanız gerekmektedir)\n\n/abonelikiptal -> aboneliğinizi iptal eder.
+    """
+  await context.bot.send_message(chat_id=update.effective_chat.id, text = message)
   info = update.message
   messages_to_add(info)
-
-
-def abonelikiptal(update, context):
-  user = update.message.from_user
-  telegramId= user["id"]
-  check_id = models.check_person(telegramId)
-  print(check_id)
-  if check_id is None:
-    text = "Aboneliğiniz bulunmamaktadır."
-    url = f"https://api.telegram.org/bot{Token}/sendMessage?chat_id={telegramId}&text={text}"
-    requests.get(url).json()
-  else:
-    models.delete_person(id)
-    text = "Aboneliğiniz iptal edilmiştir."
-    url = f"https://api.telegram.org/bot{Token}/sendMessage?chat_id={telegramId}&text={text}"
-    requests.get(url).json()
-  info = update.message
-  messages_to_add(info)
-
 
 def messages_to_add(info):
   user = info.from_user
@@ -181,12 +105,16 @@ def messages_to_add(info):
   models.add_message(telegramId, first_name, last_name, message)
 
 
-dispatcher.add_handler(telegram.ext.CommandHandler('start', start))
-dispatcher.add_handler(telegram.ext.CommandHandler('menu', getmenu))
-dispatcher.add_handler(telegram.ext.CommandHandler('yemekhane', yemekhane))
-dispatcher.add_handler(telegram.ext.CommandHandler('abonelik', abonelik))
-dispatcher.add_handler(
-  telegram.ext.CommandHandler('abonelikiptal', abonelikiptal))
-dispatcher.add_handler(telegram.ext.CommandHandler('help', help))
-updater.start_polling()
-updater.idle()
+if __name__ == '__main__':
+    application = ApplicationBuilder().token(Token).build()
+    menu_handler = CommandHandler('menu', getMenu)
+    start_handler = CommandHandler('start', start)
+    yemekhane_handler = CommandHandler('yemekhane', yemekhane)
+    help_handler = CommandHandler('help', help)
+ 
+    application.add_handler(start_handler)
+    application.add_handler(menu_handler)
+    application.add_handler(yemekhane_handler)
+    application.add_handler(help_handler)
+
+    application.run_polling()
