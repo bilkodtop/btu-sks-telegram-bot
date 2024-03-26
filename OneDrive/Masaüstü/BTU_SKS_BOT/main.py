@@ -46,7 +46,10 @@ async def getMenu(update: Update, context: ContextTypes.DEFAULT_TYPE):
       userInput = context.args[0]
     if (int(userInput) > 0):
         daysMenu = menuList[int(userInput)-1]
-        await context.bot.send_message(chat_id=update.effective_chat.id, text = daysMenu)
+        lines = daysMenu.split("\n")
+        formattedDaysMenu = f"{lines[0]} - {lines[1]}\n" + "\n".join(lines[2:])
+        daysMenuText = formattedDaysMenu
+        await context.bot.send_message(chat_id=update.effective_chat.id, text = daysMenuText)
   except(IndexError, ValueError):
     await context.bot.send_message(chat_id=update.effective_chat.id, text = "Lütfen geçerli bir gün giriniz.")
   info = update.message
@@ -86,7 +89,9 @@ def sendDaysMenu():
   kayitliKisiListesi = models.check_all()
   userInput = datetime.datetime.now().day
   daysMenu = menuList[int(userInput)-1]
-  daysMenuText = daysMenu
+  ines = daysMenu.split("\n")
+  formattedDaysMenu = f"{lines[0]} - {lines[1]}\n" + "\n".join(lines[2:])
+  daysMenuText = formattedDaysMenu
 
   for eachPerson in range(len(kayitliKisiListesi)):
     telegramId = kayitliKisiListesi[eachPerson][0]
